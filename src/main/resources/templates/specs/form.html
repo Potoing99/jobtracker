@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${spec.id} == null ? '스펙/자격증' : '스펙/자격증 수정'">스펙/자격증</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<h1 class="tl"
+    th:text="${spec.id} == null ? '스펙/자격증 등록' : '스펙/자격증 수정'">
+  스펙/자격증 등록
+</h1>
+
+<form th:action="${spec.id} == null ? @{/specs} : @{/specs}"
+      th:object="${spec}"
+      method="post">
+
+  <!-- CSRF (null-safe) -->
+  <input type="hidden" th:if="${_csrf != null}"
+         th:name="${_csrf.parameterName}"
+         th:value="${_csrf.token}"/>
+
+  <!-- id (수정 시에만 값) -->
+  <input type="hidden" th:field="*{id}"/>
+
+  <!-- 오류 배너  -->
+  <div class="banner-elevated kpi-row"
+       th:if="${#fields.hasAnyErrors()}"
+       style="margin-bottom:12px;">
+    <div class="kpi kpi-danger">
+      <span class="kpi-label">오류</span>
+      <span class="kpi-count">입력값을 확인하세요</span>
+    </div>
+  </div>
+
+  <!-- 스펙 제목 -->
+  <div class="form-row">
+    <label for="title">스펙/자격증명<span style="color:#d00;"> *</span></label>
+    <input id="title"
+           type="text"
+           th:field="*{title}"
+           placeholder="예: 정보처리산업기사, SQLD, 토익 900점">
+    <div class="field-error"
+         th:if="${#fields.hasErrors('title')}"
+         th:errors="*{title}">
+      제목 오류
+    </div>
+  </div>
+
+  <!-- 발행처/기관 -->
+  <div class="form-row">
+    <label for="issuer">발행처/기관</label>
+    <input id="issuer"
+           type="text"
+           th:field="*{issuer}"
+           placeholder="예: 한국산업인력공단, 한국TOEIC위원회">
+    <div class="field-error"
+         th:if="${#fields.hasErrors('issuer')}"
+         th:errors="*{issuer}">
+      발행처 오류
+    </div>
+  </div>
+
+  <!-- 취득일 (달력 버튼 구조도 applications 폼 그대로) -->
+  <div class="form-row">
+    <label for="acquiredAt">취득일</label>
+    <div class="input-group">
+      <input id="acquiredAt"
+             type="date"
+             th:field="*{acquiredAt}">
+      <button type="button"
+              class="picker-btn"
+              aria-label="취득일 선택"
+              onclick="(function(el){ if(!el) return; if(el.showPicker){el.showPicker();} else {el.focus(); el.click();} })(document.getElementById('acquiredAt'))">
+        📅
+      </button>
+    </div>
+  </div>
+
+  <!-- 태그 -->
+  <div class="form-row">
+    <label for="tags">태그</label>
+    <input id="tags"
+           type="text"
+           th:field="*{tags}"
+           placeholder="예: 백엔드, 그래픽">
+    <!-- 설명을 살짝 아래 + 연한 색 -->
+    <div style="margin-top:4px; font-size:0.85rem; color:#777;">
+      콤마( , )로 구분해서 여러 태그를 입력할 수 있어요.
+      (예: 백엔드,그래픽)
+    </div>
+    <div class="field-error"
+         th:if="${#fields.hasErrors('tags')}"
+         th:errors="*{tags}">
+      태그 오류
+    </div>
+  </div>
+
+  <!-- 액션 버튼  -->
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit"
+            th:text="${spec.id} == null ? '등록' : '저장'">
+      등록
+    </button>
+    <a class="btn" th:href="@{/specs}">목록</a>
+  </div>
+</form>
+
+</body>
+</html>

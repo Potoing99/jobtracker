@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header class="topbar" th:fragment="appHeader">
+  <div class="topbar-inner">
+    <!-- 좌측: 로고 -->
+    <a th:href="@{/home}" href="/home" class="brand">
+      JobTracker
+    </a>
+
+    <!-- 중앙: 주요 메뉴 -->
+    <nav class="topnav-links">
+      <a th:href="@{/applications}" href="/applications">지원현황</a>
+      <a th:href="@{/interviews}" href="/interviews">면접</a>
+      <a th:href="@{/resumes}" href="/resumes">이력서</a>
+      <a th:href="@{/specs}" href="/specs">자격증·스펙</a>
+      <a th:href="@{/coverletters}" href="/coverletters">자기소개서</a>
+    </nav>
+
+    <!-- 우측: 로그인 / 로그아웃 영역 -->
+    <div class="topnav-auth">
+      <!-- 로그인 상태 -->
+      <span class="topnav-user" sec:authorize="isAuthenticated()">
+                [[${#authentication.principal.name}]] 님
+            </span>
+      <form sec:authorize="isAuthenticated()"
+            th:action="@{/logout}" method="post">
+        <input type="hidden"
+               th:if="${_csrf != null}"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <button type="submit" class="btn-ghost-sm">
+          로그아웃
+        </button>
+      </form>
+
+      <!-- 비로그인 상태 -->
+      <a sec:authorize="isAnonymous()"
+         th:href="@{/login}" href="/login"
+         class="btn-ghost-sm">
+        로그인
+      </a>
+      <a sec:authorize="isAnonymous()"
+         th:href="@{/register/form}" href="/register/form"
+         class="btn-primary-sm">
+        회원가입
+      </a>
+    </div>
+  </div>
+</header>
+</body>
+</html>

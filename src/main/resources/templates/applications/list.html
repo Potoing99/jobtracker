@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>지원현황</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+<body>
+<div th:replace="fragments/header :: appHeader"></div>
+<h1>지원현황</h1>
+
+<!-- 상단 배너 -->
+<div class="banner-elevated" role="region" aria-labelledby="deadlineBannerTitle">
+  <div class="banner-head">
+    <div class="title-wrap">
+      <span id="deadlineBannerTitle" class="banner-title">마감 임박 요약</span>
+      <span class="banner-hint">중복 포함</span>
+      <span class="banner-hint"
+            th:text="|총 ${page.totalElements}개의 지원현황|">
+      </span>
+    </div>
+    <div class="banner-actions">
+      <a class="btn-ghost" th:href="@{/applications}">전체 보기</a>
+      <a class="btn-primary" th:href="@{/applications/new}">지원 등록</a>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <a class="kpi kpi-danger"
+       title="마감일이 지난 항목 수"
+       th:classappend="(${overdue} > 0 ? ' pulse' : '') + ((${due}=='overdue') ? ' kpi-active' : '')"
+       th:href="@{/applications(due='overdue', q=${q})}">
+      <span class="kpi-label">Overdue</span>
+      <span class="kpi-count" th:text="${overdue}?:0">0</span>
+    </a>
+
+    <a class="kpi kpi-urgent"
+       title="3일 이내 마감"
+       th:classappend="(${within3} > 0 ? ' pulse' : '') + ((${due}=='3') ? ' kpi-active' : '')"
+       th:href="@{/applications(due='3', q=${q})}">
+      <span class="kpi-label">3일 이내</span>
+      <span class="kpi-count" th:text="${within3}?:0">0</span>
+    </a>
+
+    <a class="kpi kpi-warning"
+       title="7일 이내 마감"
+       th:classappend="${due}=='7' ? ' kpi-active' : ''"
+       th:href="@{/applications(due='7', q=${q})}">
+      <span class="kpi-label">7일 이내</span>
+      <span class="kpi-count" th:text="${within7}?:0">0</span>
+    </a>
+
+    <a class="kpi kpi-info"
+       title="14일 이내 마감"
+       th:classappend="${due}=='14' ? ' kpi-active' : ''"
+       th:href="@{/applications(due='14', q=${q})}">
+      <span class="kpi-label">14일 이내</span>
+      <span class="kpi-count" th:text="${within14}?:0">0</span>
+    </a>
+  </div>
+</div>
+
+<!-- 검색 / 등록 -->
+<form th:action="@{/applications}" method="get" style="margin-bottom: 12px;">
+  <input type="text" name="q" th:value="${q}" placeholder="회사/직무 검색">
+  <input type="hidden" name="due" th:value="${due}"><!-- ★ 필터 유지 -->
+  <input type="hidden" name="page" value="0"><!-- 검색 시 항상 첫 페이지로 -->
+  <select name="size">
+    <option th:value="5"  th:selected="${size == 5}">5</option>
+    <option th:value="10" th:selected="${size == 10}">10</option>
+    <option th:value="20" th:selected="${size == 20}">20</option>
+  </select>
+  <button type="submit">검색</button>
+  <a th:href="@{/applications/new}" style="margin-left: 8px;">+ 새로 등록</a>
+</form>
+
+<!-- 플래시 메시지 -->
+<div th:if="${error}" style="color:#b00;">[[${error}]]</div>
+<div th:if="${msg}" style="color:#070;">[[${msg}]]</div>
+
+<table>
+  <thead>
+  <tr>
+    <th class="tl">회사</th>
+    <th class="tl">직무</th>
+    <th class="tc">마감일</th>
+    <th class="tc">D-Day</th>
+    <th class="tc">상태</th>
+    <th class="tc">이력서</th>
+    <th class="tr actions">상세</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="a : ${list}">
+    <td class="tl" th:text="${a.company}">회사</td>
+    <td class="tl" th:text="${a.position}">직무</td>
+    <td class="tc" th:text="${a.dueDate} ?: '-'">2025-10-01</td> <!-- null 안전 -->
+    <td class="tc" th:text="${dday.get(a.id)}">D-3</td>
+    <td class="tc" th:text="${a.status}">APPLIED</td>
+
+    <!-- 이력서 연결 여부 배지 -->
+    <td class="tc">
+      <span th:if="${a.resume != null}" class="badge badge-attached">첨부됨</span>
+      <span th:if="${a.resume == null}" class="badge badge-missing">없음</span>
+    </td>
+
+    <td class="tr actions">
+      <a class="btn" th:href="@{|/applications/${a.id}|}">상세보기</a>
+    </td>
+  </tr>
+
+  <!-- 빈 목록 안내 -->
+  <tr th:if="${#lists.isEmpty(list)}">
+    <td class="tc" colspan="7">등록된 지원 현황이 없습니다.</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- 페이저 -->
+<nav class="pager-wrap" th:if="${page != null and page.totalPages > 0}" aria-label="Applications pagination">
+  <ul class="pager">
+    <!-- 처음 / 이전 -->
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link" th:href="@{/applications(page=0, size=${size}, q=${q}, due=${due})}" aria-label="첫 페이지">«</a>
+    </li>
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link" th:href="@{/applications(page=${page.number - 1}, size=${size}, q=${q}, due=${due})}" aria-label="이전">‹</a>
+    </li>
+
+    <!-- 번호 -->
+    <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+        th:classappend="${i == page.number} ? ' active'">
+      <a class="page-link" th:if="${i != page.number}"
+         th:href="@{/applications(page=${i}, size=${size}, q=${q}, due=${due})}"
+         th:text="${i + 1}">1</a>
+      <span class="page-link" th:if="${i == page.number}" th:text="${i + 1}">1</span>
+    </li>
+
+    <!-- 다음 / 마지막 -->
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link" th:href="@{/applications(page=${page.number + 1}, size=${size}, q=${q}, due=${due})}" aria-label="다음">›</a>
+    </li>
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link" th:href="@{/applications(page=${page.totalPages - 1}, size=${size}, q=${q}, due=${due})}" aria-label="마지막 페이지">»</a>
+    </li>
+  </ul>
+
+  <!-- 현재/전체 -->
+  <div class="pager-meta">
+    <strong th:text="${page.number + 1}">1</strong>/<span th:text="${page.totalPages}">1</span>
+  </div>
+</nav>
+</body>
+</html>

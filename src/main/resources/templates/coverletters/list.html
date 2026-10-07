@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자기소개서</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+<body>
+<div th:replace="fragments/header :: appHeader"></div>
+<h1>자기소개서</h1>
+
+<!-- 상단 배너:  -->
+<div class="banner-elevated" role="region" aria-labelledby="clBannerTitle">
+  <div class="banner-head">
+    <div class="title-wrap">
+      <span id="clBannerTitle" class="banner-title">자기소개서 요약</span>
+      <span class="banner-hint"
+            th:text="|총 ${page.totalElements}개의 자기소개서|">
+        총 0개 자기소개서
+      </span>
+    </div>
+    <div class="banner-actions">
+      <a class="btn-ghost" th:href="@{/coverletters}">전체 보기</a>
+      <a class="btn-primary" th:href="@{/coverletters/new}">자기소개서 작성</a>
+    </div>
+  </div>
+</div>
+
+<!-- 검색 / 페이지 크기 -->
+<form th:action="@{/coverletters}" method="get" style="margin-bottom: 12px;">
+  <input type="text"
+         name="q"
+         th:value="${q}"
+         placeholder="제목/내용 검색">
+
+  <!-- 검색 시 항상 첫 페이지로 -->
+  <input type="hidden" name="page" value="0">
+
+  <!-- 페이지 크기 -->
+  <select name="size">
+    <option value="5"  th:selected="${size == 5}">5개씩</option>
+    <option value="10" th:selected="${size == 10}">10개씩</option>
+    <option value="20" th:selected="${size == 20}">20개씩</option>
+  </select>
+
+  <button type="submit">검색</button>
+  <a th:href="@{/coverletters}" style="margin-left: 8px;">초기화</a>
+</form>
+
+<!-- 플래시 메시지 -->
+<div th:if="${message}" style="color:#070; margin-bottom:8px;">[[${message}]]</div>
+
+<table>
+  <thead>
+  <tr>
+    <th class="tl">제목</th>
+    <th class="tc">글자수 제한</th>
+    <th class="tc">마지막 수정일</th>
+    <th class="tc actions">수정/삭제</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="letter : ${page.content}">
+    <td class="tl" th:text="${letter.title}">자기소개서 제목</td>
+
+    <td class="tc"
+        th:text="${letter.limitChars != null ? letter.limitChars + '자' : '-'}">
+      1000자
+    </td>
+
+    <td class="tc"
+        th:text="${letter.updatedAt != null ? #temporals.format(letter.updatedAt, 'yyyy-MM-dd HH:mm') : '-'}">
+      2025-11-07 12:00
+    </td>
+
+    <td class="tc actions">
+      <a class="btn"
+         th:href="@{|/coverletters/${letter.id}/edit|}">
+        수정
+      </a>
+
+      <form th:action="@{|/coverletters/${letter.id}/delete|}"
+            method="post"
+            class="d-inline"
+            onsubmit="return confirm('이 자기소개서를 삭제하시겠습니까?');">
+        <input type="hidden"
+               th:if="${_csrf != null}"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <button class="btn-ghost" type="submit">삭제</button>
+      </form>
+    </td>
+  </tr>
+
+  <!-- 빈 목록 안내 -->
+  <tr th:if="${#lists.isEmpty(page.content)}">
+    <td class="tc" colspan="4">등록된 자기소개서가 없습니다.</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- 페이징: 스펙 리스트 스타일 복붙 -->
+<nav class="pager-wrap"
+     th:if="${page != null and page.totalPages > 0}"
+     aria-label="CoverLetters pagination">
+  <ul class="pager">
+    <!-- 처음 / 이전 -->
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/coverletters(page=0, size=${size}, q=${q})}"
+         aria-label="첫 페이지">«</a>
+    </li>
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/coverletters(page=${page.number - 1}, size=${size}, q=${q})}"
+         aria-label="이전">‹</a>
+    </li>
+
+    <!-- 번호 -->
+    <li class="page-item"
+        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+        th:classappend="${i == page.number} ? ' active'">
+      <a class="page-link"
+         th:if="${i != page.number}"
+         th:href="@{/coverletters(page=${i}, size=${size}, q=${q})}"
+         th:text="${i + 1}">1</a>
+      <span class="page-link"
+            th:if="${i == page.number}"
+            th:text="${i + 1}">1</span>
+    </li>
+
+    <!-- 다음 / 마지막 -->
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/coverletters(page=${page.number + 1}, size=${size}, q=${q})}"
+         aria-label="다음">›</a>
+    </li>
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/coverletters(page=${page.totalPages - 1}, size=${size}, q=${q})}"
+         aria-label="마지막 페이지">»</a>
+    </li>
+  </ul>
+
+  <div class="pager-meta">
+    <strong th:text="${page.number + 1}">1</strong> /
+    <span th:text="${page.totalPages}">1</span>
+  </div>
+</nav>
+
+</body>
+</html>

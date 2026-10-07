@@ -1,0 +1,115 @@
+<!-- src/main/resources/templates/interviews/form.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${isEdit} ? '면접 수정' : '면접 등록'">면접 등록</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<h1 th:text="${isEdit} ? '면접 수정' : '면접 등록'">면접 등록</h1>
+
+<form th:action="${isEdit} ? @{|/interviews/${id}/edit|} : @{/interviews}"
+      th:object="${form}"
+      method="post">
+
+  <!-- CSRF(환경에 따라 필요) -->
+  <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+  <!-- 지원건 선택 -->
+  <div class="form-row">
+    <label>지원건</label>
+    <select name="applicationId" required>
+      <option th:each="a : ${applications}"
+              th:value="${a.id}"
+              th:selected="${a.id} == ${selectedApplicationId}"
+              th:text="${a.company} + ' / ' + ${a.position}">회사 / 직무</option>
+    </select>
+  </div>
+
+  <!-- 일시 + 캘린더 버튼 + D-Day 미리보기 -->
+  <div class="form-row">
+    <label>일시</label>
+    <div class="input-group">
+      <input id="scheduledAt" type="datetime-local" th:field="*{scheduledAt}" required>
+      <button type="button" class="picker-btn" aria-label="날짜/시간 선택"
+              onclick="(function(el){if(!el)return; if(el.showPicker){el.showPicker();}else{el.focus(); el.click();}})(document.getElementById('scheduledAt'))">
+        📅
+      </button>
+    </div>
+    <small id="ddayPreview" class="text-muted mt-2"></small>
+    <div th:errors="*{scheduledAt}" style="color:#b00;"></div>
+  </div>
+
+  <!-- 유형 -->
+  <div class="form-row">
+    <label>유형</label>
+    <input type="text" th:field="*{type}" placeholder="예: 1차/코테/실무/임원" required>
+    <div th:errors="*{type}" style="color:#b00;"></div>
+  </div>
+
+  <!-- 진행 형태 -->
+  <div class="form-row">
+    <label>진행 형태</label>
+    <input type="text" th:field="*{mode}" placeholder="대면/온라인/전화" required>
+    <div th:errors="*{mode}" style="color:#b00;"></div>
+  </div>
+
+  <!-- 장소/링크 -->
+  <div class="form-row">
+    <label>면접장소 위치</label>
+    <input type="text" th:field="*{placeOrLink}" placeholder="면접 장소 주소 입력시 지도 링크 지원">
+  </div>
+
+  <!-- 담당자/연락처 -->
+  <div class="form-row">
+    <label>담당자/연락처</label>
+    <input type="text" th:field="*{contact}" placeholder="홍길동 대리 / 010-1234-5678">
+  </div>
+
+  <!-- 메모 -->
+  <div class="form-row">
+    <label>메모</label>
+    <input type="text" th:field="*{memo}" placeholder="지참 서류/복장/주의사항 등">
+  </div>
+
+  <!-- 액션 -->
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit" th:text="${isEdit} ? '저장' : '등록'">등록</button>
+    <a class="btn" th:href="@{/interviews}">목록</a>
+  </div>
+</form>
+
+<!-- 폼 내 D-Day 미리보기 스크립트 -->
+<script>
+  (function(){
+    const el = document.getElementById('scheduledAt');
+    const out = document.getElementById('ddayPreview');
+
+    function fmtDday(dtStr){
+      if(!dtStr) return '';
+      const target = new Date(dtStr);
+      if (isNaN(target.getTime())) return '';
+
+      const today = new Date();
+      const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const t1 = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+      const ms = t1 - t0;
+      const days = Math.round(ms / (1000*60*60*24));
+
+      if (days > 0)  return `D-${days}`;
+      if (days === 0) return 'D-Day';
+      return `D+${Math.abs(days)}`;
+    }
+
+    function render(){ out.textContent = fmtDday(el.value); }
+
+    if (el && out) {
+      render();
+      el.addEventListener('input', render);
+      el.addEventListener('change', render);
+    }
+  })();
+</script>
+</body>
+</html>

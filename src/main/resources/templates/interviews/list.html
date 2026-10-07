@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>면접 일정</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+<body>
+<div th:replace="fragments/header :: appHeader"></div>
+<h1>면접 일정</h1>
+
+<!-- KPI 배너 -->
+<div class="banner-elevated"
+     role="region"
+     aria-labelledby="interviewBannerTitle"
+     th:if="${page != null}">
+  <div class="banner-head">
+    <div class="title-wrap">
+      <span id="interviewBannerTitle" class="banner-title">다가오는 면접 요약</span>
+      <span class="banner-hint"
+            th:text="|총 ${page.totalElements}개의 면접|">
+      </span>
+    </div>
+    <div class="banner-actions">
+      <a class="btn-ghost" th:href="@{/interviews}">전체 보기</a>
+      <a class="btn-primary" th:href="@{/interviews/new}">면접 등록</a>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <a class="kpi kpi-danger"
+       th:classappend="${due}=='overdue' ? ' kpi-active' : ''"
+       th:href="@{/interviews(due='overdue', q=${q})}">
+      <span class="kpi-label">Overdue</span>
+      <span class="kpi-count" th:text="${overdue}?:0">0</span>
+    </a>
+    <a class="kpi kpi-urgent"
+       th:classappend="${due}=='3' ? ' kpi-active' : ''"
+       th:href="@{/interviews(due='3', q=${q})}">
+      <span class="kpi-label">3일 내</span>
+      <span class="kpi-count" th:text="${within3}?:0">0</span>
+    </a>
+    <a class="kpi kpi-warning"
+       th:classappend="${due}=='7' ? ' kpi-active' : ''"
+       th:href="@{/interviews(due='7', q=${q})}">
+      <span class="kpi-label">7일 내</span>
+      <span class="kpi-count" th:text="${within7}?:0">0</span>
+    </a>
+    <a class="kpi kpi-info"
+       th:classappend="${due}=='14' ? ' kpi-active' : ''"
+       th:href="@{/interviews(due='14', q=${q})}">
+      <span class="kpi-label">14일 내</span>
+      <span class="kpi-count" th:text="${within14}?:0">0</span>
+    </a>
+  </div>
+</div>
+
+<!-- 검색창 -->
+<form th:action="@{/interviews}" method="get" style="margin-bottom:12px;">
+  <input type="text" name="q" th:value="${q}" placeholder="회사/직무/연락처/메모 검색">
+  <input type="hidden" name="due" th:value="${due}">
+  <button type="submit">검색</button>
+  <a th:href="@{/interviews}" class="btn" style="margin-left:6px;">초기화</a>
+</form>
+
+<table>
+  <thead>
+  <tr>
+    <th class="tc">일시</th>
+    <th class="tc">D-Day</th>
+    <th class="tl">유형</th>
+    <th class="tl">형태</th>
+    <th class="tl">장소/링크</th>
+    <th class="tl">회사/직무</th>
+    <th class="tr actions">상세</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="i : ${list}">
+    <!-- ✅ 파싱 오류 원인부 수정: 전체를 한 번의 ${...} 안에 -->
+    <td class="tc"
+        th:text="${ i.scheduledAt != null ? #temporals.format(i.scheduledAt,'yyyy-MM-dd HH:mm') : '-' }">
+      2025-11-01 10:00
+    </td>
+
+    <td class="tc" th:text="${dday.get(i.id)}">D-3</td>
+    <td class="tl" th:text="${i.type}">1차</td>
+    <td class="tl" th:text="${i.mode}">대면</td>
+
+    <td class="tl">
+      <span th:text="${i.placeOrLink} ?: '-'">-</span>
+      <div class="mt-2" th:if="${i.placeOrLink}">
+        <a class="btn btn-outline-primary btn-sm"
+           th:href="@{|https://www.google.com/maps/search/?api=1&query=${#uris.escapeQueryParam(i.placeOrLink)}|}"
+           target="_blank" rel="noopener">구글</a>
+        <a class="btn btn-outline-secondary btn-sm"
+           th:href="@{|https://map.naver.com/p/search/${#uris.escapePath(i.placeOrLink)}|}"
+           target="_blank" rel="noopener">네이버</a>
+      </div>
+    </td>
+
+    <td class="tl" th:text="${i.application.company} + ' / ' + ${i.application.position}">ABC / 백엔드</td>
+    <td class="tr actions">
+      <a class="btn" th:href="@{|/interviews/${i.id}|}">상세</a>
+    </td>
+  </tr>
+
+  <tr th:if="${#lists.isEmpty(list)}">
+    <td class="tc" colspan="7">등록된 면접 일정이 없습니다.</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- 페이저 -->
+<nav class="pager-wrap" th:if="${page != null and page.totalPages > 0}" aria-label="Interviews pagination">
+  <ul class="pager">
+    <!-- 처음 / 이전 -->
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link" th:href="@{/interviews(page=0, size=${size}, q=${q}, due=${due})}" aria-label="첫 페이지">«</a>
+    </li>
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link" th:href="@{/interviews(page=${page.number - 1}, size=${size}, q=${q}, due=${due})}" aria-label="이전">‹</a>
+    </li>
+
+    <!-- 번호 -->
+    <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+        th:classappend="${i == page.number} ? ' active'">
+      <a class="page-link" th:if="${i != page.number}"
+         th:href="@{/interviews(page=${i}, size=${size}, q=${q}, due=${due})}"
+         th:text="${i + 1}">1</a>
+      <span class="page-link" th:if="${i == page.number}" th:text="${i + 1}">1</span>
+    </li>
+
+    <!-- 다음 / 마지막 -->
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link" th:href="@{/interviews(page=${page.number + 1}, size=${size}, q=${q}, due=${due})}" aria-label="다음">›</a>
+    </li>
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link" th:href="@{/interviews(page=${page.totalPages - 1}, size=${size}, q=${q}, due=${due})}" aria-label="마지막 페이지">»</a>
+    </li>
+  </ul>
+
+  <!-- 현재/전체 -->
+  <div class="pager-meta">
+    <strong th:text="${page.number + 1}">1</strong>/<span th:text="${page.totalPages}">1</span>
+  </div>
+</nav>
+</body>
+</html>

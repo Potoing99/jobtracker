@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${isEdit} ? '자소서 수정' : '자소서 작성'">자소서</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+  <style>
+    /* 글자수 초과 시 스타일 */
+    textarea.over-limit {
+      border-color: #d00;
+      background-color: #fff0f0;
+    }
+
+    .char-counter {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    #charWarning {
+      margin-top: 2px;
+      font-size: 0.8rem;
+      color: #d00;
+      display: none;
+    }
+
+    /* 자소서 내용 textarea 크게 & 가로 전체 사용 */
+    #content {
+      width: 100%;
+      max-width: 100%;
+      min-height: 320px;   /* 필요하면 400, 500 등으로 더 키워도 됨 */
+      box-sizing: border-box;
+      resize: vertical;    /* 세로 방향 크기 조절 가능 */
+    }
+
+    /* 왼쪽 폼 + 오른쪽 자격증 패널 2단 레이아웃 */
+    .form-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .form-main {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .form-side {
+      flex: 0 0 320px;  /* 오른쪽 패널 너비 */
+      max-width: 360px;
+    }
+
+    /* 스펙 리스트 영역 (읽기 전용) */
+    .spec-panel {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 12px;
+      background-color: #fafafa;
+    }
+
+    .spec-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .spec-panel-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .spec-panel-tag {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background-color: #eee;
+      color: #666;
+    }
+
+    .spec-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.9rem;
+      max-height: 260px;      /* 너무 길어지면 스크롤 */
+      overflow-y: auto;
+    }
+
+    .spec-list li {
+      margin-bottom: 4px;
+    }
+
+    .field-hint {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<h1 class="tl"
+    th:text="${isEdit} ? '자소서 수정' : '자소서 작성'">
+  자소서 작성
+</h1>
+
+<div class="form-layout">
+  <!-- ===== 왼쪽: 자소서 입력 폼 ===== -->
+  <div class="form-main">
+    <form th:action="${isEdit} ? @{'/coverletters/' + ${coverLetter.id} + '/edit'} : @{/coverletters}"
+          th:object="${coverLetter}"
+          method="post">
+
+      <!-- CSRF (null-safe) -->
+      <input type="hidden" th:if="${_csrf != null}"
+             th:name="${_csrf.parameterName}"
+             th:value="${_csrf.token}"/>
+
+      <!-- id (수정 시에만 값) -->
+      <input type="hidden" th:field="*{id}"/>
+
+      <!-- 오류 배너 -->
+      <div class="banner-elevated kpi-row"
+           th:if="${#fields.hasAnyErrors()}"
+           style="margin-bottom:12px;">
+        <div class="kpi kpi-danger">
+          <span class="kpi-label">오류</span>
+          <span class="kpi-count">입력값을 확인해주세요!</span>
+        </div>
+      </div>
+
+      <!-- 제목 -->
+      <div class="form-row">
+        <label for="title">제목<span style="color:#d00;"> *</span></label>
+        <input id="title"
+               type="text"
+               th:field="*{title}"
+               placeholder="예: 2025 상반기 자기소개서">
+        <div class="field-error"
+             th:if="${#fields.hasErrors('title')}"
+             th:errors="*{title}">
+          제목 오류
+        </div>
+      </div>
+
+      <!-- 글자수 제한 프리셋 -->
+      <div class="form-row">
+        <label for="limitChars">글자수 제한<span style="color:#d00;"> *</span></label>
+        <select id="limitChars" th:field="*{limitChars}">
+          <option th:each="limit : ${limits}"
+                  th:value="${limit}"
+                  th:text="${limit + '자'}">
+            1000자
+          </option>
+        </select>
+        <div class="field-error"
+             th:if="${#fields.hasErrors('limitChars')}"
+             th:errors="*{limitChars}">
+          글자수 제한 오류
+        </div>
+      </div>
+
+      <!-- 내용 -->
+      <div class="form-row">
+        <label for="content">내용<span style="color:#d00;"> *</span></label>
+        <textarea id="content"
+                  rows="12"
+                  th:field="*{content}"
+                  placeholder="자기소개서 내용을 입력하세요."></textarea>
+        <div class="field-error"
+             th:if="${#fields.hasErrors('content')}"
+             th:errors="*{content}">
+          내용 오류
+        </div>
+
+        <!-- 글자수 카운터 -->
+        <div class="char-counter">
+          글자 수:
+          <span id="charCount">0</span> /
+          <span id="charLimit">0</span> 자
+        </div>
+        <div id="charWarning">
+          글자 수가 제한을 초과했습니다. 내용을 줄이거나 글자수 제한을 조정하세요.
+        </div>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit"
+                th:text="${isEdit} ? '저장' : '등록'">
+          등록
+        </button>
+        <a class="btn" th:href="@{/coverletters}">목록</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== 오른쪽: 자격증 / 스펙 탭 (읽기 전용) ===== -->
+  <aside class="form-side">
+    <div class="spec-panel">
+      <div class="spec-panel-header">
+        <span class="spec-panel-title">자격증 / 스펙 </span>
+      </div>
+
+      <div th:if="${specs != null and !#lists.isEmpty(specs)}">
+        <ul class="spec-list">
+          <li th:each="spec : ${specs}">
+            <!-- 그냥 텍스트만 출력 (클릭/수정 링크 없음) -->
+            <strong th:text="${spec.title}"></strong>
+            <span th:if="${spec.issuer != null}"
+                  th:text="${' · ' + spec.issuer}">
+            </span>
+            <span th:if="${spec.acquiredAt != null}"
+                  th:text="${' (' + #temporals.format(spec.acquiredAt, 'yyyy-MM-dd') + ')'}">
+              (2025-01-01)
+            </span>
+          </li>
+        </ul>
+        <div class="field-hint">
+          참고하고 싶은 내용은 드래그해서 복사한 뒤, 왼쪽 자소서 내용에 붙여넣기 해서 사용하세요.
+        </div>
+      </div>
+
+      <div class="field-hint"
+           th:if="${specs == null or #lists.isEmpty(specs)}">
+        스펙 탭에서 자격증/스펙을 등록하면 이곳에 최신 순으로 표시됩니다.
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- 글자수 카운트 스크립트 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var contentEl = document.getElementById('content');
+    var limitEl = document.getElementById('limitChars');
+    var countSpan = document.getElementById('charCount');
+    var limitSpan = document.getElementById('charLimit');
+    var warnEl = document.getElementById('charWarning');
+
+    function updateCounter() {
+      if (!contentEl || !limitEl) return;
+
+      var text = contentEl.value || "";
+      var len = text.length;
+
+      var limitVal = parseInt(limitEl.value || "0", 10);
+
+      countSpan.textContent = len;
+      limitSpan.textContent = limitVal > 0 ? limitVal : 0;
+
+      if (limitVal > 0 && len > limitVal) {
+        contentEl.classList.add('over-limit');
+        warnEl.style.display = 'block';
+      } else {
+        contentEl.classList.remove('over-limit');
+        warnEl.style.display = 'none';
+      }
+    }
+
+    if (contentEl && limitEl) {
+      contentEl.addEventListener('input', updateCounter);
+      limitEl.addEventListener('change', updateCounter);
+      // 초기 한 번 계산
+      updateCounter();
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>JobTracker 홈</title>
+
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+<body class="page-home">
+<div class="home-root">
+
+    <!-- 상단 헤더: 로고 + 메뉴 + 로그인/로그아웃 -->
+    <div th:replace="fragments/header :: appHeader"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="home-main">
+        <div class="home-shell">
+
+            <!-- 1) 상단 히어로: 좌측 소개, 우측 D-Day 요약 -->
+            <section class="home-hero-row">
+                <!-- 좌: 텍스트 + CTA -->
+                <div class="home-hero-left">
+                    <div>
+                        <div class="home-hero-title">
+                            오늘의 취업 준비를 한 눈에 정리해주세요.
+                        </div>
+                        <div class="home-hero-sub">
+                            지원 마감 일정, 면접 스케줄, 자소서와 이력서까지
+                            한 곳에서 관리하는 JobTracker 캡스톤 프로젝트 홈 화면입니다.
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a th:href="@{/applications}" href="/applications" class="btn-hero-main">
+                            바로 지원현황 등록하기
+                        </a>
+                        <a th:href="@{/interviews}" href="/interviews" class="btn-hero-sub">
+                            면접 일정 확인
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 우: D-Day 미니 카드 -->
+                <div class="home-hero-right">
+                    <div class="home-hero-right-title">
+                        마감 D-Day 요약
+                    </div>
+                    <hr class="home-hero-divider"/>
+
+                    <div class="kpi-row-tight">
+                        <div class="kpi-mini kpi-mini-overdue">
+                            <div class="kpi-mini-label">OVERDUE</div>
+                            <div class="kpi-mini-value">
+                                [[${overdueCount}]]건
+                            </div>
+                            <div class="kpi-mini-hint">이미 마감 지난 공고 수</div>
+                        </div>
+                        <div class="kpi-mini kpi-mini-d3">
+                            <div class="kpi-mini-label">D-3</div>
+                            <div class="kpi-mini-value">
+                                [[${d3Count}]]건
+                            </div>
+                            <div class="kpi-mini-hint">3일 안에 마감 예정</div>
+                        </div>
+                        <div class="kpi-mini kpi-mini-d7">
+                            <div class="kpi-mini-label">D-7</div>
+                            <div class="kpi-mini-value">
+                                [[${d7Count}]]건
+                            </div>
+                            <div class="kpi-mini-hint">1주일 안에 마감</div>
+                        </div>
+                        <div class="kpi-mini kpi-mini-d14">
+                            <div class="kpi-mini-label">D-14</div>
+                            <div class="kpi-mini-value">
+                                [[${d14Count}]]건
+                            </div>
+                            <div class="kpi-mini-hint">2주일 안에 마감</div>
+                        </div>
+                    </div>
+                    <div class="home-meta-caption">
+                        지원 마감일을 꼭 확인해주세요!!
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2) 메인 그리드: 지원 / 면접 / 기타 모듈 -->
+            <section class="home-grid">
+                <!-- ✅ 임박한 지원현황 카드 -->
+                <div class="card-home">
+                    <div class="card-home-header">
+                        <span>임박한 지원현황</span>
+                    </div>
+                    <div class="card-home-body">
+
+                        <!-- 데이터 없을 때 -->
+                        <p class="home-empty-text" th:if="${#lists.isEmpty(upcomingApplications)}">
+                            아직 D-14 이내 마감 예정인 지원이 없습니다.
+                            <br>
+                            <strong>지원현황</strong>에서 새로운 지원을 등록해주세요.
+                        </p>
+
+                        <!-- 데이터 있을 때: 최대 5개 -->
+                        <ul class="upcoming-list" th:if="${!#lists.isEmpty(upcomingApplications)}">
+                            <li class="upcoming-item" th:each="app : ${upcomingApplications}">
+                                <!-- 왼쪽: 회사 / 직무 / 상태 -->
+                                <div class="upcoming-main">
+                                    <div class="upcoming-company" th:text="${app.company}">회사명</div>
+                                    <div class="upcoming-position" th:text="${app.position}">직무</div>
+
+                                    <span class="chip-status"
+                                          th:text="${app.status}">상태</span>
+                                </div>
+
+                                <!-- 오른쪽: 마감일 -->
+                                <div class="upcoming-deadline">
+                                    <div class="upcoming-date"
+                                         th:text="${app.dueDate != null ? #temporals.format(app.dueDate, 'MM/dd') : '-'}">
+                                        11/22
+                                    </div>
+                                    <div class="upcoming-date-caption">
+                                        마감일
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="home-meta-caption" th:if="${!#lists.isEmpty(upcomingApplications)}">
+                            최대 5개까지만 표시됩니다. 자세한 내용은 <strong>지원현황 전체 보기</strong>에서 확인하세요.
+                        </div>
+                    </div>
+                    <div class="card-home-footer">
+                        <a th:href="@{/applications}" href="/applications" class="btn-ghost-sm">
+                            지원현황 전체 보기
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ✅ 다가오는 면접 일정 카드 (실데이터 버전) -->
+                <div class="card-home">
+                    <div class="card-home-header">
+                        <span>다가오는 면접 일정</span>
+                    </div>
+                    <div class="card-home-body">
+
+                        <!-- 데이터 없을 때 -->
+                        <p class="home-empty-text" th:if="${#lists.isEmpty(upcomingInterviews)}">
+                            아직 등록된 다가오는 면접 일정이 없습니다.
+                            <br>
+                            <strong>면접</strong> 탭에서 새로운 면접 일정을 등록해주세요.
+                        </p>
+
+                        <!-- 데이터 있을 때: 최대 5개 -->
+                        <ul class="upcoming-list" th:if="${!#lists.isEmpty(upcomingInterviews)}">
+                            <li class="upcoming-item" th:each="iv : ${upcomingInterviews}">
+                                <!-- 왼쪽: 회사 / 직무 / 유형/형태 -->
+                                <div class="upcoming-main">
+                                    <div class="upcoming-company"
+                                         th:text="${iv.application != null ? iv.application.company : '회사 미지정'}">
+                                        회사명
+                                    </div>
+                                    <div class="upcoming-position"
+                                         th:text="${iv.application != null ? iv.application.position : '직무 미지정'}">
+                                        직무
+                                    </div>
+
+                                    <span class="chip-status"
+                                          th:text="${iv.type} + ' · ' + ${iv.mode}">
+                                        1차 · 대면
+                                    </span>
+                                </div>
+
+                                <!-- 오른쪽: 면접 일시 -->
+                                <div class="upcoming-deadline">
+                                    <div class="upcoming-date"
+                                         th:text="${iv.scheduledAt != null ? #temporals.format(iv.scheduledAt, 'MM/dd HH:mm') : '-'}">
+                                        11/22 10:00
+                                    </div>
+                                    <div class="upcoming-date-caption">
+                                        면접 일정
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="home-meta-caption" th:if="${!#lists.isEmpty(upcomingInterviews)}">
+                            최대 5개까지만 표시됩니다. 자세한 내용은 <strong>면접 일정 전체 보기</strong>에서 확인하세요.
+                        </div>
+                    </div>
+                    <div class="card-home-footer">
+                        <a th:href="@{/interviews}" href="/interviews" class="btn-ghost-sm">
+                            면접 일정 전체 보기
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ✅ 이력서/스펙/자소서 카드 -->
+                <div class="card-home">
+                    <div class="card-home-header">
+                        <span>이력서 · 자격증/스펙 · 자기소개서</span>
+                    </div>
+                    <div class="card-home-body">
+
+                        <!-- ✅ 아무 데이터도 없을 때: 안내 문구만 -->
+                        <p class="home-empty-text"
+                           th:if="${(resumeCount ?: 0) == 0 and (specCount ?: 0) == 0 and (coverLetterCount ?: 0) == 0}">
+                            아직 저장된 이력서, 자격증·스펙, 자기소개서가 없습니다.
+                            <br>
+                            각 탭에서 새로운 항목을 등록해주세요.
+                        </p>
+
+                        <!-- ✅ 하나라도 있으면 개수 요약 보여주기 -->
+                        <div th:if="${(resumeCount ?: 0) > 0 or (specCount ?: 0) > 0 or (coverLetterCount ?: 0) > 0}">
+                            <ul class="upcoming-list">
+                                <li class="upcoming-item">
+                                    <div class="upcoming-main">
+                                        <div class="upcoming-company">이력서</div>
+                                        <div class="upcoming-position">저장된 이력서 버전 수</div>
+                                    </div>
+                                    <div class="upcoming-deadline">
+                                        <div class="upcoming-date"
+                                             th:text="${resumeCount} + '개'">0개</div>
+                                    </div>
+                                </li>
+
+                                <li class="upcoming-item">
+                                    <div class="upcoming-main">
+                                        <div class="upcoming-company">자격증 · 스펙</div>
+                                        <div class="upcoming-position">등록된 자격증/스펙 수</div>
+                                    </div>
+                                    <div class="upcoming-deadline">
+                                        <div class="upcoming-date"
+                                             th:text="${specCount} + '개'">0개</div>
+                                    </div>
+                                </li>
+
+                                <li class="upcoming-item">
+                                    <div class="upcoming-main">
+                                        <div class="upcoming-company">자기소개서</div>
+                                        <div class="upcoming-position">저장된 자기소개서 항목 수</div>
+                                    </div>
+                                    <div class="upcoming-deadline">
+                                        <div class="upcoming-date"
+                                             th:text="${coverLetterCount} + '개'">0개</div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div class="home-meta-caption">
+                                각 탭에서 관리 중인 데이터 개수를 요약해서 보여줍니다.
+                            </div>
+                        </div>
+
+                        <!-- ✅ 버튼은 데이터가 있든 없든 항상 노출 -->
+                        <div class="home-stack-links">
+                            <a th:href="@{/resumes}" href="/resumes" class="btn-ghost-sm">
+                                이력서 관리
+                            </a>
+                            <a th:href="@{/specs}" href="/specs" class="btn-ghost-sm">
+                                자격증·스펙 관리
+                            </a>
+                            <a th:href="@{/coverletters}" href="/coverletters" class="btn-ghost-sm">
+                                자기소개서 관리
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-home-footer">
+        <span class="muted" style="font-size: 0.72rem;">
+            * 모든 데이터는 로그인한 계정 기준으로만 표시됩니다.
+        </span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${isEdit} ? '지원현황 수정' : '지원현황 등록'">지원현황</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<h1 class="tl" th:text="${isEdit} ? '지원현황 수정' : '지원현황 등록'">지원현황 등록</h1>
+
+<form th:action="${isEdit} ? @{|/applications/${id}/edit|} : @{/applications}"
+      th:object="${form}"
+      method="post">
+
+  <!-- CSRF (null-safe) -->
+  <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+  <!-- 오류 배너 (인터뷰 폼과 동일한 위치/스타일) -->
+  <div class="banner-elevated kpi-row" th:if="${#fields.hasAnyErrors()}" style="margin-bottom:12px;">
+    <div class="kpi kpi-danger">
+      <span class="kpi-label">오류</span>
+      <span class="kpi-count">입력값을 확인하세요</span>
+    </div>
+  </div>
+
+  <!-- 회사 -->
+  <div class="form-row">
+    <label for="company">회사</label>
+    <input id="company" type="text" th:field="*{company}" placeholder="회사명을 입력">
+    <div class="field-error" th:if="${#fields.hasErrors('company')}" th:errors="*{company}">회사 오류</div>
+  </div>
+
+  <!-- 직무 -->
+  <div class="form-row">
+    <label for="position">직무</label>
+    <input id="position" type="text" th:field="*{position}" placeholder="지원 직무를 입력">
+    <div class="field-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}">직무 오류</div>
+  </div>
+
+  <!-- 지원일 (달력 버튼 동일) -->
+  <div class="form-row">
+    <label for="appliedAt">지원일</label>
+    <div class="input-group">
+      <input id="appliedAt" type="date" th:field="*{appliedAt}">
+      <button type="button" class="picker-btn" aria-label="지원일 선택"
+              onclick="(function(el){ if(!el) return; if(el.showPicker){el.showPicker();} else {el.focus(); el.click();} })(document.getElementById('appliedAt'))">
+        📅
+      </button>
+    </div>
+    <div class="field-error" th:if="${#fields.hasErrors('appliedAt')}" th:errors="*{appliedAt}">지원일 오류</div>
+  </div>
+
+  <!-- 마감일 (달력 버튼 동일) -->
+  <div class="form-row">
+    <label for="dueDate">마감일</label>
+    <div class="input-group">
+      <input id="dueDate" type="date" th:field="*{dueDate}">
+      <button type="button" class="picker-btn" aria-label="마감일 선택"
+              onclick="(function(el){ if(!el) return; if(el.showPicker){el.showPicker();} else {el.focus(); el.click();} })(document.getElementById('dueDate'))">
+        📅
+      </button>
+    </div>
+    <div class="field-error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}">마감일 오류</div>
+  </div>
+
+  <!-- 상태 -->
+  <div class="form-row">
+    <label for="status">상태</label>
+    <select id="status" th:field="*{status}">
+      <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}">APPLIED</option>
+    </select>
+    <div class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">상태 오류</div>
+  </div>
+
+  <!-- 이력서 (셀렉트 아래에 업로드 링크 배치) -->
+  <div class="form-row">
+    <label for="resumeId">이력서</label>
+    <select id="resumeId" name="resumeId">
+      <option value="" th:selected="${selectedResumeId == null}">— 이력서 선택 —</option>
+      <!-- 문자열 포맷은 파이프 리터럴로 안전 처리 -->
+      <option th:each="r : ${resumes}"
+              th:value="${r.id}"
+              th:selected="${selectedResumeId != null and r.id == selectedResumeId}"
+              th:text="|${r.title} (${(r.size != null ? #numbers.formatDecimal(r.size/1024.0,1,1) : '0.0')} KB)|">
+        이력서
+      </option>
+    </select>
+    <div style="margin-top:8px;">
+      <!-- 프로젝트에 form/view만 있다고 했으니 업로드는 form 화면으로 링크 -->
+      <a class="btn btn-ghost" th:href="@{/resumes/form}">새 이력서 업로드</a>
+    </div>
+  </div>
+
+  <!-- 액션 (버튼 스타일/위치 인터뷰 폼과 동일) -->
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit" th:text="${isEdit} ? '저장' : '등록'">등록</button>
+    <a class="btn" th:href="@{/applications}">목록</a>
+  </div>
+</form>
+</body>
+</html>

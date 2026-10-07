@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>면접 상세</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">면접 상세</h1>
+      <!-- D-Day 칩 -->
+      <span class="chip" th:if="${dday != null}" th:text="${dday}">D-3</span>
+    </div>
+
+    <div class="card-body">
+      <dl class="meta-grid">
+        <dt>일시</dt>
+        <dd th:text="${#temporals.format(itv.scheduledAt, 'yyyy-MM-dd HH:mm')}">2025-11-01 10:00</dd>
+
+        <dt>유형</dt>
+        <dd th:text="${itv.type}">1차면접</dd>
+
+        <dt>형태</dt>
+        <dd th:text="${itv.mode}">대면</dd>
+
+        <dt>면접장소 위치</dt>
+        <dd>
+          <span th:text="${itv.placeOrLink} ?: '-'">-</span>
+
+          <!-- 장소명이 있을 때만 지도 버튼 노출 -->
+          <div class="mt-2" th:if="${itv.placeOrLink}">
+            <a class="btn btn-outline-primary btn-sm"
+               th:href="@{|https://www.google.com/maps/search/?api=1&query=${#uris.escapeQueryParam(itv.placeOrLink)}|}"
+               target="_blank" rel="noopener">구글 지도</a>
+
+            <a class="btn btn-outline-secondary btn-sm"
+               th:href="@{|https://map.naver.com/p/search/${#uris.escapePath(itv.placeOrLink)}|}"
+               target="_blank" rel="noopener">네이버 지도</a>
+
+            <a class="btn btn-outline-secondary btn-sm"
+               th:href="@{|https://map.kakao.com/?q=${#uris.escapeQueryParam(itv.placeOrLink)}|}"
+               target="_blank" rel="noopener">카카오 지도</a>
+          </div>
+        </dd>
+
+        <dt>담당자/연락처</dt>
+        <dd th:text="${itv.contact} ?: '-'">-</dd>
+
+        <dt>메모</dt>
+        <dd th:text="${itv.memo} ?: '-'">-</dd>
+
+        <dt>지원건</dt>
+        <dd>
+          <span th:text="${itv.application.company} + ' / ' + ${itv.application.position}">회사 / 직무</span>
+        </dd>
+      </dl>
+    </div>
+
+    <div class="card-footer">
+      <div class="form-actions">
+        <a class="btn btn-primary" th:href="@{|/interviews/${itv.id}/edit|}">수정</a>
+        <form th:action="@{|/interviews/${itv.id}/delete|}" method="post" style="display:inline;">
+          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button class="btn" type="submit" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
+        </form>
+        <a class="btn" th:href="@{/interviews}">목록</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

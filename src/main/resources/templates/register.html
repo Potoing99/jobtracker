@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>회원가입 - JobTracker</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+  <style>
+    .auth-container {
+      max-width: 480px;
+      margin: 48px auto 0 auto;
+    }
+    .auth-title {
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .form-input {
+      width: 100%;
+      padding: 8px 10px;
+      box-sizing: border-box;
+    }
+    .form-actions {
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+
+    /* ⬇⬇ 버튼 두 개를 한 줄에, 같은 크기 + 글자 한 줄 고정 */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-row .btn {
+      flex: 1;
+      text-align: center;
+      font-size: 0.95rem;     /* 글자 살짝 줄이기 */
+      white-space: nowrap;    /* 줄바꿈 방지 */
+    }
+
+    /* 메인(회원가입) 버튼은 프로젝트 기본 primary 색 사용 */
+    .btn-main {
+      /* 추가 스타일 필요 없으면 비워둬도 됨 */
+    }
+
+    /* 서브(로그인 화면으로) 버튼: 흰 배경 + 연한 테두리 */
+    .btn-sub {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      color: #333;
+    }
+    .btn-sub:hover {
+      background: #f7f7f7;
+    }
+
+    .error {
+      color: #e06666;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+    .global-error {
+      color: #f0ad4e;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-container">
+  <h1 class="auth-title">회원가입</h1>
+
+  <div class="card">
+    <div class="card-body">
+      <form th:action="@{/register/form}" th:object="${userForm}" method="post">
+
+        <input type="hidden"
+               th:if="${_csrf != null}"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+
+        <div class="form-group">
+          <label for="email" class="form-label">이메일</label>
+          <input type="email"
+                 id="email"
+                 th:field="*{email}"
+                 class="form-input"
+                 placeholder="you@example.com">
+          <div th:if="${#fields.hasErrors('email')}"
+               th:errors="*{email}"
+               class="error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="name" class="form-label">이름</label>
+          <input type="text"
+                 id="name"
+                 th:field="*{name}"
+                 class="form-input"
+                 placeholder="홍길동">
+          <div th:if="${#fields.hasErrors('name')}"
+               th:errors="*{name}"
+               class="error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">비밀번호</label>
+          <input type="password"
+                 id="password"
+                 th:field="*{password}"
+                 class="form-input"
+                 placeholder="8자 이상">
+          <div th:if="${#fields.hasErrors('password')}"
+               th:errors="*{password}"
+               class="error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">비밀번호 확인</label>
+          <input type="password"
+                 id="confirmPassword"
+                 th:field="*{confirmPassword}"
+                 class="form-input"
+                 placeholder="비밀번호 재입력">
+          <div th:if="${#fields.hasErrors('confirmPassword')}"
+               th:errors="*{confirmPassword}"
+               class="error"></div>
+        </div>
+
+        <div th:if="${#fields.hasGlobalErrors()}" class="global-error">
+          <p th:each="e : ${#fields.globalErrors()}" th:text="${e}"></p>
+        </div>
+
+        <!-- 버튼 2개: 한 줄에 동일 크기 -->
+        <div class="form-actions">
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary btn-main">
+              회원가입
+            </button>
+            <a th:href="@{/login}" class="btn btn-sub">
+              로그인 화면으로
+            </a>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

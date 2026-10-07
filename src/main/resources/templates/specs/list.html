@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>스펙/자격증</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+<body>
+<div th:replace="fragments/header :: appHeader"></div>
+<h1>스펙/자격증</h1>
+
+<!-- 상단 배너: 구조는 applications 배너랑 비슷하게, 내용만 단순하게 -->
+<div class="banner-elevated"
+     role="region"
+     aria-labelledby="specBannerTitle"
+     th:if="${page != null}">
+  <div class="banner-head">
+    <div class="title-wrap">
+      <span id="specBannerTitle" class="banner-title">스펙/자격증 요약</span>
+      <span class="banner-hint"
+            th:text="|총 ${page.totalElements}개 스펙/자격증|">
+      </span>
+    </div>
+    <div class="banner-actions">
+      <a class="btn-ghost" th:href="@{/specs}">전체 보기</a>
+      <a class="btn-primary" th:href="@{/specs/new}">스펙/자격증 등록</a>
+    </div>
+  </div>
+</div>
+
+<!-- 검색 / 정렬 (지원현황 검색 폼이랑 위치/느낌 맞춤) -->
+<form th:action="@{/specs}" method="get" style="margin-bottom: 12px;">
+  <input type="text"
+         name="q"
+         th:value="${q}"
+         placeholder="제목/발행처/태그 검색">
+
+  <!-- 검색 시 항상 첫 페이지로 -->
+  <input type="hidden" name="page" value="0">
+
+  <!-- 정렬: 취득일/제목 -->
+  <select name="sort">
+    <option value="latest"
+            th:selected="${sort} == 'latest'">
+      취득일 최신순
+    </option>
+    <option value="oldest"
+            th:selected="${sort} == 'oldest'">
+      취득일 오래된순
+    </option>
+    <option value="title"
+            th:selected="${sort} == 'title'">
+      이름순
+    </option>
+  </select>
+
+  <button type="submit">검색</button>
+  <a th:href="@{/specs}" style="margin-left: 8px;">초기화</a>
+</form>
+
+<!-- 플래시 메시지 -->
+<div th:if="${errorMessage}" style="color:#b00;">[[${errorMessage}]]</div>
+<div th:if="${message}" style="color:#070;">[[${message}]]</div>
+
+<table>
+  <thead>
+  <tr>
+    <th class="tl">스펙/자격증명</th>
+    <th class="tl">발행처/기관</th>
+    <th class="tc">취득일</th>
+    <th class="tl">태그</th>
+    <th class="tc actions">수정/삭제</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- page.content 를 그대로 사용 -->
+  <tr th:each="s : ${page.content}">
+    <td class="tl" th:text="${s.title}">스펙/자격증</td>
+
+    <td class="tl">
+      <span th:if="${s.issuer != null}"
+            th:text="${s.issuer}">
+        발행처
+      </span>
+      <span th:if="${s.issuer == null}" class="text-muted small">
+        -
+      </span>
+    </td>
+
+    <td class="tc">
+      <span th:text="${s.acquiredAt != null ? #temporals.format(s.acquiredAt, 'yyyy-MM-dd') : '-'}">
+        2025-11-07
+      </span>
+    </td>
+
+    <td class="tl">
+      <span th:if="${s.tags != null}"
+            th:text="${s.tags}">
+        백엔드,그래픽
+      </span>
+      <span th:if="${s.tags == null}" class="text-muted small">
+        태그 없음
+      </span>
+    </td>
+
+    <td class="tc actions">
+      <a class="btn"
+         th:href="@{|/specs/${s.id}/edit|}">
+        수정
+      </a>
+
+      <form th:action="@{|/specs/${s.id}/delete|}"
+            method="post"
+            class="d-inline"
+            onsubmit="return confirm('이 스펙을 삭제하시겠습니까?');">
+        <input type="hidden"
+               th:if="${_csrf != null}"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <button class="btn-ghost" type="submit">삭제</button>
+      </form>
+    </td>
+  </tr>
+
+  <!-- 빈 목록 안내 -->
+  <tr th:if="${#lists.isEmpty(page.content)}">
+    <td class="tc" colspan="5">등록된 스펙/자격증이 없습니다.</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- 페이저:  -->
+<nav class="pager-wrap"
+     th:if="${page != null and page.totalPages > 0}"
+     aria-label="Specs pagination">
+  <ul class="pager">
+    <!-- 처음 / 이전 -->
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/specs(page=0, size=${size}, q=${q}, sort=${sort})}"
+         aria-label="첫 페이지">«</a>
+    </li>
+    <li class="page-item" th:classappend="${page.first} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/specs(page=${page.number - 1}, size=${size}, q=${q}, sort=${sort})}"
+         aria-label="이전">‹</a>
+    </li>
+
+    <!-- 번호 -->
+    <li class="page-item"
+        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+        th:classappend="${i == page.number} ? ' active'">
+      <a class="page-link"
+         th:if="${i != page.number}"
+         th:href="@{/specs(page=${i}, size=${size}, q=${q}, sort=${sort})}"
+         th:text="${i + 1}">1</a>
+      <span class="page-link"
+            th:if="${i == page.number}"
+            th:text="${i + 1}">1</span>
+    </li>
+
+    <!-- 다음 / 마지막 -->
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/specs(page=${page.number + 1}, size=${size}, q=${q}, sort=${sort})}"
+         aria-label="다음">›</a>
+    </li>
+    <li class="page-item" th:classappend="${page.last} ? ' disabled'">
+      <a class="page-link"
+         th:href="@{/specs(page=${page.totalPages - 1}, size=${size}, q=${q}, sort=${sort})}"
+         aria-label="마지막 페이지">»</a>
+    </li>
+  </ul>
+
+  <div class="pager-meta">
+    <strong th:text="${page.number + 1}">1</strong> /
+    <span th:text="${page.totalPages}">1</span>
+  </div>
+</nav>
+
+</body>
+</html>

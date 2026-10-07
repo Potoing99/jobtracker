@@ -1,0 +1,718 @@
+/* ===== 공통 ===== */
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+.container { max-width: 920px; margin: 24px auto; padding: 0 12px; }
+
+/* 여백 유틸 */
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mb-2 { margin-bottom: 8px; }
+
+/* 텍스트 유틸 */
+.text-muted { color:#6b7280; }
+
+/* ===== 테이블 ===== */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px 12px; vertical-align: middle; border: 1px solid #ddd; }
+thead th { background: #f7f7f7; }
+
+/* 정렬 유틸 */
+.tl { text-align: left; }
+.tc { text-align: center; }
+.tr { text-align: right; }
+
+/* ===== 배너(베이직) ===== */
+.banner { margin: 8px 0 16px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 8px; background:#fff; }
+@media (max-width: 640px) { .banner { text-align: center; } }
+
+/* ===== 카드 ===== */
+.card { border: 1px solid #e7e7e7; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+.card-header { padding: 14px 16px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.card-title { margin: 0; font-size: 18px; }
+.card-body { padding: 16px; }
+.card-footer { padding: 12px 16px; border-top: 1px solid #eee; }
+.card.muted { background:#f9fbff; border-style:dashed; }
+
+/* ===== 배지/칩 ===== */
+.badge { display:inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; border: 1px solid; }
+.badge-applied   { background:#f5f8ff; border-color:#d7e3ff; color:#244270; }
+.badge-interview { background:#fff6d6; border-color:#ffe6a6; color:#7a5c00; }
+.badge-offer     { background:#eafff1; border-color:#c6f0d5; color:#0b6e2d; }
+.badge-rejected  { background:#ffe9e9; border-color:#ffc7c7; color:#8a1f1f; }
+
+/* 이력서 연결 여부(리스트용 확장) */
+.badge-attached{ background:#e6f6e6; color:#146c2e; border:1px solid #c9e9c9; }
+.badge-missing { background:#f2f4f7; color:#475467; border:1px solid #e5e7eb; }
+
+.chip { display:inline-block; padding: 4px 10px; border-radius: 999px; font-size:12px; border:1px solid #ddd; background:#fafafa; }
+
+/* ===== 상세 메타 그리드 ===== */
+.meta-grid { display:grid; grid-template-columns: 140px 1fr; column-gap:16px; row-gap:10px; }
+.meta-grid dt { margin:0; font-weight:600; color:#555; }
+.meta-grid dd { margin:0; }
+
+/* ===== 폼 ===== */
+.form-card .form-body { padding: 16px; }
+.form-row { margin-bottom: 12px; }
+.form-row label { display:block; font-weight:600; margin-bottom: 6px; }
+.form-row input, .form-row select { width: 100%; padding: 8px 10px; border:1px solid #d9d9d9; border-radius:8px; }
+
+.form-actions { display:flex; justify-content:center; gap:10px; }
+
+/* ===== 버튼 ===== */
+.btn { display:inline-block; padding:8px 14px; border:1px solid #d9d9d9; border-radius:8px; background:#fff; color:#333; text-decoration:none; }
+.btn:hover { background:#f6f6f6; border-color:#cfcfcf; }
+
+.btn-primary { background:#f5f7ff; border-color:#cfd8ff; } /* 기본 연한 파랑 버튼 */
+.btn-link { color:#0b5ed7; text-decoration:underline; }
+
+.btn-outline-primary { background:#fff; color:#0b5ed7; border:1px solid #0b5ed7; }
+.btn-outline-secondary { background:#fff; color:#475467; border:1px solid #d7dee9; }
+.btn-outline-primary:hover, .btn-outline-secondary:hover { filter:brightness(.98); }
+
+/* 리스트 액션(텍스트 링크 중앙 + 조금 넓게) */
+th.actions, td.actions { min-width: 140px; text-align: center; white-space: nowrap; }
+td.actions a { color:#333; text-decoration:none; font-weight:500; }
+td.actions a:hover { text-decoration:underline; }
+td.actions a + a { margin-left:10px; padding-left:10px; border-left:1px solid #eee; }
+
+/* ===== “임팩트 배너” ===== */
+.banner-elevated{
+  margin:16px 0; padding:14px 16px; border-radius:16px;
+  background: linear-gradient(180deg,#fafcff 0%,#f6f8fc 100%);
+  border:1px solid #e6ecf5; box-shadow:0 4px 14px rgba(16,24,40,.06);
+}
+.banner-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
+.title-wrap{ display:flex; align-items:center; gap:8px; }
+.banner-title{ font-weight:700; font-size:16px; }
+.banner-hint{ font-size:12px; color:#6b7280; background:#eef2f7; border-radius:10px; padding:2px 8px; }
+
+.banner-actions{ display:flex; gap:8px; }
+.btn-ghost{ padding:6px 10px; border-radius:10px; border:1px solid #d7dee9; background:#fff; font-size:13px; }
+.btn-ghost:hover{ background:#f7fafc; }
+/* 배너 안에서만 진한 파랑 버튼(기존 .btn-primary와 충돌 없도록 컨테이너 스코프 적용) */
+.banner-actions .btn-primary{ padding:6px 12px; border-radius:10px; background:#0b5ed7; color:#fff; font-size:13px; border:1px solid #0b5ed7; }
+.banner-actions .btn-primary:hover{ filter:brightness(.96); }
+
+.kpi-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+@media (max-width:760px){ .kpi-row{ grid-template-columns:1fr 1fr; } }
+
+.kpi{
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:14px; text-decoration:none; border:1px solid transparent;
+  transition:transform .08s ease, box-shadow .12s ease;
+}
+.kpi:hover{ transform:translateY(-1px); box-shadow:0 6px 16px rgba(16,24,40,.08); }
+.kpi:focus{ outline:2px solid #98c2ff; outline-offset:2px; }
+
+.kpi-label{ font-size:13px; opacity:.85; }
+.kpi-count{ font-weight:800; font-size:18px; letter-spacing:.2px; }
+
+/* 색상 매핑 */
+.kpi-danger { background:#ffe5e5; color:#b00020; }   /* Overdue */
+.kpi-urgent { background:#ffd6cc; color:#8a2200; }   /* 3일 내 */
+.kpi-warning{ background:#fff3cd; color:#7a4d00; }   /* 7일 내 */
+.kpi-info   { background:#e7f1ff; color:#0b5ed7; }   /* 14일 내 */
+
+/* 중요도 높은 것만 펄스 */
+@keyframes pulseBadge{ 0%{transform:scale(1)} 50%{transform:scale(1.04)} 100%{transform:scale(1)} }
+.pulse .kpi-count{ animation:pulseBadge .9s ease-in-out 0s 6; }
+/* hover시 애니 중지 */
+.kpi:hover .kpi-count{ animation:none; }
+
+/* 배너가 페이지 상단에 붙을 때 여백 보정 */
+.banner-elevated + *{ margin-top:10px; }
+
+/* ===== 상세 - 이력서 카드 내부(추가) ===== */
+.resume-grid{ display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; }
+.meta{ display:flex; gap:8px; margin:6px 0; }
+.meta-label{ min-width:64px; color:#6b7280; }
+.meta-value{ font-weight:600; }
+.resume-actions{ display:flex; gap:8px; }
+
+/* 선택된 KPI 시각 강조 */
+.kpi-active{ outline:2px solid #98c2ff; outline-offset:2px; box-shadow:0 0 0 3px rgba(11,94,215,.12) inset; }
+
+/* 기본 캘린더 아이콘을 숨기고(잘림 방지), 우리 버튼만 사용 */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator{
+  opacity:0; /* 크롬/엣지 */
+}
+
+/* 파이어폭스 등에서 기본 아이콘/스핀 버튼 제거 */
+input[type="datetime-local"]{
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
+
+/* 높이/라인 보정: 확대/풀화면에서도 잘림 방지 */
+input[type="datetime-local"]{
+  min-height: 40px;
+  line-height: 1.2;
+  padding-right: 10px; /* 우측 버튼과 간섭 없도록 */
+}
+
+/* 입력+버튼 그룹 */
+.input-group{ display:flex; gap:6px; align-items:center; }
+.input-group input[type="datetime-local"]{ flex:1; }
+
+/* 달력 버튼: 대비 높게 */
+.picker-btn{
+  padding:8px 10px; border-radius:8px; border:1px solid #0b5ed7;
+  background:#0b5ed7; color:#fff; font-weight:600; cursor:pointer;
+}
+.picker-btn:hover{ filter:brightness(.96); }
+.picker-btn:focus{ outline:2px solid #98c2ff; outline-offset:2px; }
+
+/* 외부 링크 표시 및 긴 URL 줄바꿈 */
+.external-link { color:#0b5ed7; text-decoration:underline; word-break: break-all; }
+
+/* Pager */
+.pager-wrap { display:flex; align-items:center; justify-content:center; gap:12px; margin:16px 0; }
+.pager { list-style:none; margin:0; padding:0; display:flex; gap:6px; }
+.pager .page-item { display:inline-flex; }
+.pager .page-link {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:34px; height:34px; padding:0 10px;
+  border:1px solid #ddd; border-radius:8px;
+  text-decoration:none; font-size:14px; line-height:1;
+}
+.pager .page-item.active .page-link { background:#111; color:#fff; border-color:#111; cursor:default; }
+.pager .page-item.disabled .page-link { opacity:.4; pointer-events:none; }
+.pager-meta { font-size:14px; color:#666; }
+
+.field-error {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #d32f2f;        /* 🔴 원하는 색으로 변경 */
+  font-weight: 500;
+}
+
+.home-hero-right-head {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb; /* 제목 영역과 카드 영역을 확실히 나누는 선 */
+}
+
+/* ===== 상단 공통 헤더 ===== */
+
+.topbar {
+    background: #111827;
+    color: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.45);
+}
+
+.topbar-inner {
+    width: 100%;
+    max-width: 1280px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: #f9fafb;
+}
+
+.topnav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.topnav-links a {
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: #e5e7eb;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+}
+
+.topnav-links a:hover {
+    background-color: rgba(148, 163, 184, 0.2);
+}
+
+.topnav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.topnav-user {
+    color: #e5e7eb;
+}
+
+.btn-ghost-sm,
+.btn-primary-sm {
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background: transparent;
+    color: #e5e7eb;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.btn-ghost-sm:hover {
+    background-color: rgba(148, 163, 184, 0.18);
+}
+
+/* 회원가입 버튼 강조 */
+.btn-primary-sm {
+    border-color: #38bdf8;
+    color: #e0f2fe;
+    background: transparent;
+}
+
+.btn-primary-sm:hover {
+    background: rgba(56, 189, 248, 0.18);
+}
+
+/* ====== Home 전용 스타일 ===== */
+
+/* 전체 배경 & 기본 레이아웃 */
+body.page-home {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6fb;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.home-root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 메인 컨텐츠 영역 */
+.home-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem 2rem;
+}
+
+.home-shell {
+    width: 100%;
+    max-width: 1280px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* 상단 히어로: 좌측 텍스트 + 우측 D-Day 요약 */
+.home-hero-row {
+    display: grid;
+    grid-template-columns: 1.7fr 1.1fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 992px) {
+    .home-hero-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.home-hero-left {
+    background: radial-gradient(circle at top left, #38bdf8 0, #0f172a 40%, #020617 100%);
+    border-radius: 1rem;
+    padding: 1.6rem 1.8rem;
+    color: #e5e7eb;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 190px;
+}
+
+.home-hero-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.home-hero-sub {
+    font-size: 0.9rem;
+    color: #cbd5f5;
+    max-width: 32rem;
+}
+
+.hero-actions {
+    margin-top: 1.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+
+.btn-hero-main {
+    border-radius: 999px;
+    padding: 0.6rem 1.3rem;
+    font-size: 0.9rem;
+    border: none;
+    background: #f9fafb;
+    color: #0f172a;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+}
+
+.btn-hero-main:hover {
+    background: #e5e7eb;
+}
+
+.btn-hero-sub {
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.85rem;
+    border: 1px solid rgba(191, 219, 254, 0.9);
+    background: rgba(15, 23, 42, 0.4);
+    color: #e5e7eb;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-hero-sub:hover {
+    background: rgba(15, 23, 42, 0.7);
+}
+
+.home-hero-right {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+    padding: 1.1rem 1.2rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.home-hero-right-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* D-Day 제목 아래 구분선 */
+.home-hero-divider {
+    margin-top: 0.35rem;
+    margin-bottom: 0.55rem;
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.kpi-row-tight {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    .kpi-row-tight {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.kpi-mini {
+    padding: 0.35rem 0.6rem 0.25rem;
+    border-radius: 0.6rem;
+    border: 1px solid #e5e7eb;
+}
+
+/* D-Day별 박스 색상 + 텍스트 강조 */
+.kpi-mini-overdue {
+    background-color: #fee2e2;
+    border-color: #fecaca;
+}
+
+.kpi-mini-overdue .kpi-mini-label {
+    color: #b91c1c;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.kpi-mini-overdue .kpi-mini-value {
+    color: #b91c1c;
+}
+
+.kpi-mini-d3 {
+    background-color: #fff7ed;
+    border-color: #fed7aa;
+}
+
+.kpi-mini-d3 .kpi-mini-label {
+    color: #c2410c;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.kpi-mini-d3 .kpi-mini-value {
+    color: #c2410c;
+}
+
+.kpi-mini-d7 {
+    background-color: #fef9c3;
+    border-color: #fef08a;
+}
+
+.kpi-mini-d7 .kpi-mini-label {
+    color: #92400e;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.kpi-mini-d7 .kpi-mini-value {
+    color: #92400e;
+}
+
+.kpi-mini-d14 {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.kpi-mini-d14 .kpi-mini-label {
+    color: #1d4ed8;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.kpi-mini-d14 .kpi-mini-value {
+    color: #1d4ed8;
+}
+
+.kpi-mini-label {
+    font-size: 0.7rem;
+}
+
+.kpi-mini-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-top: 0.15rem;
+}
+
+.kpi-mini-hint {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 0.05rem;
+}
+
+/* 메인 그리드: 지원 / 면접 / 기타 모듈 */
+.home-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1.6fr 1.2fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+    .home-grid {
+        grid-template-columns: 1.5fr 1.5fr;
+    }
+}
+
+@media (max-width: 846px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-home {
+    background: #ffffff;
+    border-radius: 0.9rem;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+    overflow: hidden;
+}
+
+.card-home-header {
+    padding: 0.8rem 1rem 0.4rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-home-body {
+    padding: 0.75rem 1rem 0.4rem;
+    flex: 1;
+}
+
+.card-home-footer {
+    padding: 0.6rem 1rem 0.8rem;
+    border-top: 1px dashed #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 카드 푸터 버튼: 네이비 컬러 */
+.card-home-footer .btn-ghost-sm {
+    background: #111827;
+    border-color: #111827;
+    color: #f9fafb;
+    font-weight: 500;
+}
+
+.card-home-footer .btn-ghost-sm:hover {
+    background: #1f2937;
+}
+
+.home-empty-text {
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.home-list-sample {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #4b5563;
+    padding-left: 1rem;
+}
+
+.home-list-sample li {
+    margin-bottom: 0.15rem;
+}
+
+.home-meta-caption {
+    margin-top: 0.45rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.quick-links-row {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.quick-chip {
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.8rem;
+    border: 1px dashed #d1d5db;
+    background: #f9fafb;
+    text-decoration: none;
+    color: #374151;
+}
+
+.quick-chip:hover {
+    background: #e5e7eb;
+}
+
+.muted {
+    color: #9ca3af;
+}
+
+/* ===== 임박한 지원현황 / 면접 리스트 전용 스타일 ===== */
+
+.upcoming-list {
+    margin-top: 0.6rem;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+}
+
+.upcoming-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.upcoming-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.upcoming-company {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.upcoming-position {
+    font-size: 0.8rem;
+    color: #4b5563;
+    margin-top: 0.1rem;
+}
+
+.chip-status {
+    margin-top: 0.25rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #e0e7ff;
+}
+
+.upcoming-deadline {
+    text-align: right;
+    font-size: 0.78rem;
+    color: #4b5563;
+}
+
+.upcoming-date {
+    font-weight: 600;
+    color: #111827;
+}
+
+.upcoming-date-caption {
+    margin-top: 0.1rem;
+    font-size: 0.7rem;
+    color: #9ca3af;
+}
+
+/* 이력서/스펙/자소서 카드 하단 버튼 스택 */
+.home-stack-links {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    align-items: center;
+}
+
+.home-stack-links .btn-ghost-sm {
+    width: 100%;
+    max-width: 260px;
+    justify-content: center;
+    background: #111827;
+    border-color: #111827;
+    color: #f9fafb;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.home-stack-links .btn-ghost-sm:hover {
+    background: #1f2937;
+}
